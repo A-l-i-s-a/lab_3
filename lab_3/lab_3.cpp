@@ -29,7 +29,7 @@ public:
 	{
 		SetConsoleCP(1251);
 		SetConsoleOutputCP(1251);
-		int N, size, i, j, k, min, jmin1, jmin2, max, imax, s, v;
+		int N, size, i, j, k, min, jmin1, jmin2, max, imax, s, v; // size - размер файла; i, j, k - перем в цикле; min - поиск мин знач; jmin1 - индекс мин знач; jmin2 - ; max - ; imax - ; s - ; v - ;
 		int Max = -(signed int)2u / 2;
 		int b[256] = { 0 };
 		haff* h; short* c; unsigned char* p, g;
@@ -38,33 +38,39 @@ public:
 		in.seekg(0, ios::end);
 		size = in.tellg();
 		in.seekg(0, ios::beg);
-		p = new unsigned char[size];
+		p = new unsigned char[size]; // size - размер файла
 		if (!p) cerr << "Error memory!\n", exit(1);
 		in.read((char*)p, size); in.close();
-		for (i = 0; i < size; i++) b[p[i]]++;
-		for (N = i = 0; i < 256; i++) N += !!b[i];
+		for (i = 0; i < size; i++) b[p[i]]++;  // считает кол-во символов; p[i] - индекс(код числа); инкрементируем элемент массива b по индексу p[i]
+		for (N = i = 0; i < 256; i++) N += !!b[i]; // сколько всего символов; !! - двойное отрицание (если есть символ 0 -> второе отрицание 1); N - сколько есть символов; 
 		cout << "N=" << N << endl;
 		h = new haff[2 * N + 1];
-		if (!h) cerr << "Error memory!\n", exit(1);
-		for (j = 0; j < 2 * N - 1; j++) h[j].c = h[j].s = h[j].i = h[j].k = h[j].p = h[j].j = 0;
+		if (!h) cerr << "Error memory!\n", exit(1); // начальное заполнение
+		for (j = 0; j < 2 * N - 1; j++) h[j].c = h[j].s = h[j].i = h[j].k = h[j].p = h[j].j = 0; // подсчет символов
 		for (j = i = 0; i < 256; i++) if (b[i]) h[j].s = b[i], h[j++].c = i;
 		vector<vector<char>*> V(N);
-		for (j = -N; j < 0; imax >= 0 ? h[imax].i = h[imax].j = j++ : j++) for (imax = -1, max = k = 0; k < N; k++) if (!h[k].i)
+		for (j = -N; j < 0; imax >= 0 ? h[imax].i = h[imax].j = j++ : j++) for (imax = -1, max = k = 0; k < N; k++) if (!h[k].i) 
 			if (h[k].s > max) max = h[k].s, imax = k;
 		for (s = j = 0; j < N; s += h[j++].s);
 		cout << "s=" << s << endl;
-		for (i = 0; i < N - 1; i++)
+		// построение дерева
+		// отрицательный индекс i сортировка по убыванию j тоже самое ниже 7 построение дерева
+		// p - указатель на ячейку для посторения делева (на ячейку от 0 до 14)
+		// сортировака первых 8 элементов, j сохраняет дерево сортировки 
+		for (i = 0; i < N - 1; i++) // заполнение массива структура для алгоритма хаффмана
 		{
 			for (min = Max, jmin1 = -1, j = 0; j < N + i; j++) if (!h[j].p) if (min >= h[j].s) min = h[j].s, jmin1 = j;
 			h[jmin1].p = N + i;
 			for (min = Max, jmin2 = -1, j = 0; j < N + i; j++) if (!h[j].p) if (min >= h[j].s) min = h[j].s, jmin2 = j;
 			h[jmin2].p = N + i;
-			if (Q) h[jmin1].k = 0x30, h[jmin2].k = 0x31; // установка цифрового кода (0 или 1) по вероятности
+			if (Q) h[jmin1].k = 0x30, h[jmin2].k = 0x31; // установка цифрового кода (0 или 1) по вероятности; 30 31 -код символа(0, 1); 2 способа простой и сохранением структуры(i, j)
 			else if (h[jmin1].j < h[jmin2].j) h[N + i].j = h[jmin1].j, h[jmin1].k = 0x31, h[jmin2].k = 0x30; else
 				h[N + i].j = h[jmin2].j, h[jmin1].k = 0x30, h[jmin2].k = 0x31;
 			h[N + i].s = h[jmin1].s + h[jmin2].s;
 			h[N + i].i = i + 1;
 		}
+
+		// анализ дерева
 		for (j = 0; j < N; j++)
 		{
 			for (i = 0, k = j; h[k].p; k = h[k].p, i++);
@@ -76,7 +82,7 @@ public:
 		ofstream ou(nameOutFile, ios::binary); 
 		if (!ou) cerr << "Error create the file\"" << nameInFile << "\"\n", exit(1);
 		g = N - 1; ou.put(g);
-		for (j = 0; j < N; j++)
+		for (j = 0; j < N; j++) // кодирование файлов
 			for (ou.put(h[j].c), g = V[j]->size(), ou.put(g), i = 0; i < V[j]->size(); i += 8, ou.put(g))
 				for (g = k = 0; k < 8; ++k) g |= ((*V[j])[(i + k) % V[j]->size()] & 1) << (7 - k);
 		for (i = 0; i < 256; b[i++] = -1); for (i = 0; i < N; b[(unsigned char)h[i].c] = i++);
@@ -143,7 +149,8 @@ public:
 			if (c[2 * v + k] < N) ou.put(a[c[2 * v + k]]), v = N - 2;
 			else v = c[2 * v + k] - N;
 		}
-		ou.close(); delete[] p, delete[] c, delete[] a;
+		ou.close(); 
+		delete[] p, delete[] c, delete[] a;
 	}
 };
 

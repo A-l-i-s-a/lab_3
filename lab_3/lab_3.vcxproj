@@ -139,8 +139,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Downloads\lab3_1.cpp" />
-    <ClCompile Include="..\..\..\..\Downloads\lab3_2.cpp" />
     <ClCompile Include="lab_3.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
